@@ -1,3 +1,4 @@
+require 'sidekiq'
 require 'sidekiq/haron/formatter'
 require 'sidekiq/haron/storage'
 require 'sidekiq/haron/transmitter'
@@ -10,7 +11,13 @@ require 'sidekiq/haron/version'
 module Sidekiq
   module Haron
 
-    mattr_accessor :transmitter
+    def self.transmitter
+      Sidekiq.options[:transmitter]
+    end
+
+    def self.transmitter= v
+      Sidekiq.options[:transmitter] = v
+    end
 
     def self.install transmitter_class
       Sidekiq::Haron.transmitter = transmitter_class.new

@@ -1,3 +1,4 @@
+require 'sidekiq/exception_handler'
 class Sidekiq::Haron::ExceptionLogger < Sidekiq::ExceptionHandler::Logger
 
   def self.install
