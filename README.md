@@ -1,8 +1,6 @@
 # Sidekiq::Haron
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/sidekiq/haron`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Transfer some metadata to sidekiq job, can tag sidekiq logs and add logging job args. Example request_id or other request info.
 
 ## Installation
 
@@ -22,7 +20,43 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Аdd to project class  inheriting from `Sidekiq::Haron::Transmitter` like this:
+
+```ruby
+class HaronTransmitter < Sidekiq::Haron::Transmitter
+
+  def saved_data *args
+    {
+      request_id: Current.request_id,
+      parent_request_id: Current.parent_request_id
+    }
+  end
+
+  def load_data hash
+    Current.request_id = hash['request_id'].presence || SecureRandom.hex
+    Current.parent_request_id = hash['parent_request_id']
+  end
+
+  def tags
+    [Current.parent_request_id]
+  end
+
+end
+```
+
+Аdd to `config/initializers/sidekiq.rb`:
+
+```ruby
+Sidekiq::Haron.install(HaronTransmitter)
+```
+
+Now all your sidekiq log have `Current.parent_request_id` value as tag and log job args too:
+
+```
+2020-01-14T14:22:09.035Z  TestWorker JID-940645f14b345b3b4031d1cc I: [4f445354] with args [1, {"q"=>2}]
+2020-01-14T14:22:09.035Z  TestWorker JID-940645f14b345b3b4031d1cc I: [4f445354] start
+2020-01-14T14:22:09.041Z  TestWorker JID-940645f14b345b3b4031d1cc I: [4f445354] done: 0.006 sec
+```
 
 ## Development
 
@@ -32,7 +66,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/sidekiq-haron.
+Bug reports and pull requests are welcome on GitHub at https://github.com/Rnd-Soft/sidekiq-haron.
 
 ## License
 

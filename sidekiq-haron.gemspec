@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["wolferingys@gmail.com"]
 
   spec.summary       = %q{Transfer some data to sidekiq job and can tag sidekiq logs}
-  spec.description   = %q{Transfer some data to sidekiq job and can tag sidekiq logs}
+  spec.description   = %q{Transfer some metadata to sidekiq job, can tag sidekiq logs and add logging job args}
   spec.homepage      = "https://github.com/Rnd-Soft/sidekiq-haron"
   spec.license       = "MIT"
 
