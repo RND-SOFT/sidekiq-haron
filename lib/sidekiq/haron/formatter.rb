@@ -1,12 +1,16 @@
-class Sidekiq::Haron::Formatter < Sidekiq::Logging::Pretty
+module Sidekiq
+  module Haron
+    class Formatter < Sidekiq::Logging::Pretty
   
-  def call(severity, time, program_name, message)
-    result = "#{context} #{severity.to_s[0]}: #{message}\n"
-    if ENV['RAILS_LOG_TO_STDOUT'].present?
-      result
-    else
-      "#{time.utc.iso8601(3)} #{result}"
+      def call(severity, time, program_name, message)
+        result = "#{context} #{severity.to_s[0]}: #{message}\n"
+        if ENV['RAILS_LOG_TO_STDOUT'].present?
+          result
+        else
+          "#{time.utc.iso8601(3)} #{result}"
+        end
+      end
+      
     end
   end
-  
 end
