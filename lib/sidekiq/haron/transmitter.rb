@@ -16,7 +16,7 @@ module Sidekiq
       end
 
       def tagged
-        Rails.logger.tagged(tags) do 
+        ::Rails.logger.tagged(tags) do 
           Sidekiq.logger.tagged(tags) do 
             yield
           end
