@@ -11,8 +11,15 @@ module Sidekiq
       def load jid
         load_data read_for_id(jid)
       rescue => e
-        Sidekiq.logger.error "loading data error - #{e.to_s}"
+        Sidekiq.logger.error "loading data error #{jid} - #{e.to_s}"
         {}
+      end
+
+      def clean jid
+        clean_for_id(jid)
+      rescue => e
+        Sidekiq.logger.error "clean error #{jid} - #{e.to_s}"
+        nil
       end
 
       def tagged

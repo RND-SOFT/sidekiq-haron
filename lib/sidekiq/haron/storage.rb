@@ -2,7 +2,7 @@ module Sidekiq
   module Haron
     module Storage
 
-      DEFAULT_EXPIRY = 30 * 24 * 60 * 60 # 30 days
+      DEFAULT_EXPIRY = 7 * 24 * 60 * 60 # 7 days
 
       protected
 
@@ -18,6 +18,12 @@ module Sidekiq
       def read_for_id(id)
         Sidekiq.redis do |conn|
           conn.hgetall(key(id))
+        end
+      end
+
+      def clean_for_id(id)
+        Sidekiq.redis do |conn|
+          conn.del(key(id))
         end
       end
 
