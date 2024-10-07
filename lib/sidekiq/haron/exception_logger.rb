@@ -1,4 +1,3 @@
-require 'sidekiq/exception_handler'
 module Sidekiq
   module Haron
     class ExceptionLogger < Sidekiq::Logger
