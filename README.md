@@ -20,7 +20,7 @@ Or install it yourself as:
 
 ## Usage
 
-Аdd to project class  inheriting from `Sidekiq::Haron::Transmitter` like this:
+Аdd to project class inheriting from `Sidekiq::Haron::Transmitter` like this:
 
 ```ruby
 class HaronTransmitter < Sidekiq::Haron::Transmitter
@@ -53,9 +53,9 @@ Sidekiq::Haron.install(HaronTransmitter)
 Now all your sidekiq log have `Current.parent_request_id` value as tag and log job args too:
 
 ```
-2020-01-14T14:22:09.035Z  TestWorker JID-940645f14b345b3b4031d1cc I: [4f445354] with args [1, {"q"=>2}]
-2020-01-14T14:22:09.035Z  TestWorker JID-940645f14b345b3b4031d1cc I: [4f445354] start
-2020-01-14T14:22:09.041Z  TestWorker JID-940645f14b345b3b4031d1cc I: [4f445354] done: 0.006 sec
+2020-01-14T14:22:09.035Z class=TestWorker jid=940645f14b345b3b4031d1cc I: [4f445354] with args [1, {"q"=>2}]
+2020-01-14T14:22:09.035Z class=TestWorker jid=940645f14b345b3b4031d1cc I: [4f445354] start
+2020-01-14T14:22:09.041Z class=TestWorker jid=940645f14b345b3b4031d1cc elapsed=0.006 I: [4f445354] done
 ```
 
 ## Development

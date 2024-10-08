@@ -3,7 +3,7 @@ module Sidekiq
     class Formatter < Sidekiq::Logger::Formatters::Pretty
 
       def call(severity, time, program_name, message)
-        result = "#{context} #{severity.to_s[0]}: #{message}\n"
+        result = "#{format_context} #{severity.to_s[0]}: #{message}\n"
         if ENV['RAILS_LOG_TO_STDOUT'].present?
           result
         else
