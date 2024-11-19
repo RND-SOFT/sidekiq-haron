@@ -12,11 +12,11 @@ module Sidekiq
   module Haron
 
     def self.transmitter
-      Sidekiq[:transmitter]
+      @transmitter
     end
 
     def self.transmitter= v
-      Sidekiq[:transmitter] = v
+      @transmitter = v
     end
 
     def self.install transmitter_class
@@ -33,11 +33,12 @@ module Sidekiq
 
     def self.set_loggers
       Sidekiq.configure_server do |config|
-        config.log_formatter = Sidekiq::Haron::Formatter.new
+        config.logger.formatter = Sidekiq::Haron::Formatter.new
+        config.logger = ActiveSupport::TaggedLogging.new(Sidekiq.logger)
+
+        config[:job_logger] = Sidekiq::Haron::JobLogger
+        config.error_handlers << Sidekiq::Haron::ExceptionLogger.new
       end
-      Sidekiq[:job_logger] = Sidekiq::Haron::JobLogger
-      Sidekiq[:error_handlers] << Sidekiq::Haron::ExceptionLogger.new
-      Sidekiq.logger = ActiveSupport::TaggedLogging.new(Sidekiq.logger)
     end
 
     def self.configure_client_middleware(sidekiq_config)

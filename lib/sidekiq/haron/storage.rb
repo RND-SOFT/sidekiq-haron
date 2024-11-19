@@ -9,7 +9,9 @@ module Sidekiq
       def store_for_id(id, data, redis_pool=nil)
         redis_connection(redis_pool) do |conn|
           conn.multi do |pipeline|
-            pipeline.hmset  key(id), *(data.to_a.flatten(1))
+            values = data.to_a.flatten(1).map{ |each| each.nil? ? '' : each }.map{ |each| each == true ? 1 : (each == false ? 0 : each) }
+
+            pipeline.hset  key(id), *values
             pipeline.expire key(id), DEFAULT_EXPIRY
           end[0]
         end
