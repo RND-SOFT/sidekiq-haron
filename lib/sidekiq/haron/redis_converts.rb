@@ -7,14 +7,15 @@ module Sidekiq
         #   true  - 'TrueClass'
         #   false - 'FalseClass'
 
-        CLASSES_TO_CONVERT      = [NilClass, TrueClass, FalseClass].freeze
-        CLASSES_TO_CONVERT_STR  = CLASSES_TO_CONVERT.map{ |v| v.to_s }.freeze
+        CLASSES_TO_CONVERT  = { NilClass  => {redis_value: 'NilClass',    orig_value: nil},
+                              TrueClass   => {redis_value: 'TrueClass',   orig_value: true},
+                              FalseClass  => {redis_value: 'FalseClass',  orig_value: false} }.freeze
 
         def encode_values_from array
           return array unless array.is_a?(Array)
 
           array.map do |value|
-            CLASSES_TO_CONVERT.include?(value.class) ? value.class.to_s : value
+            CLASSES_TO_CONVERT.keys.include?(value.class) ? CLASSES_TO_CONVERT[value.class][:redis_value] : value
           end
         end
 
@@ -22,19 +23,19 @@ module Sidekiq
           return hash unless hash.is_a?(Hash)
 
           hash.transform_values do |value|
-            if CLASSES_TO_CONVERT_STR.include? value
-              if value.downcase.include? 'true'
-                value = true
-              elsif value.downcase.include? 'false'
-                value = false
-              else
-                value = nil
-              end
-            else
-              value
-            end
+            key = key_by_redis_value(value)
+            value = key.nil? ? value : CLASSES_TO_CONVERT[key][:orig_value]
           end
         end
+
+        private
+
+        def key_by_redis_value redis_value
+          CLASSES_TO_CONVERT.each do |k, v|
+            return k if v[:redis_value] == redis_value
+          end
+        end
+
       end
     end
   end
