@@ -9,7 +9,21 @@ module Sidekiq
       def store_for_id(id, data, redis_pool=nil)
         redis_connection(redis_pool) do |conn|
           conn.multi do |pipeline|
-            pipeline.hmset  key(id), *(data.to_a.flatten(1))
+            # При попытке записи хэша с полями nil, true, false
+            # валится задание с исключением "Unsupported command argument type: NilClass/TrueClass/FalseClass (TypeError)"
+            # Пример из консоли Rails (такое же поведение в "бою", данные взяты из реальных кейсов)
+            # d = [ :request_id, "9c30943e299135b1fe826d7be6195e78", :parent_request_id, "9c30943e",:user_id, nil ]
+            # Sidekiq.redis { |c| c.call('hmset', "kkk", d) }
+            # ~/.rvm/gems/ruby-3.3.5/gems/irb-1.14.1/lib/irb.rb:1260:in `full_message': Unsupported command argument type: NilClass (TypeError)
+            # raise TypeError, "Unsupported command argument type: #{element.class}"
+            #       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            # Потому введена интерпретация значений:
+            #   nil   - ''
+            #   true  - 1
+            #   false - 0
+            values = data.to_a.flatten(1).map{ |each| each.nil? ? '' : each }.map{ |each| each == true ? 1 : (each == false ? 0 : each) }
+            # уход от deprecated-предупреждений внутри sidekiq - нативный вызов hmset для клиента redis
+            pipeline.call('hmset', key(id), *(values))
             pipeline.expire key(id), DEFAULT_EXPIRY
           end[0]
         end
