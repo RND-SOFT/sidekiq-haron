@@ -23,12 +23,15 @@ module Sidekiq
       end
 
       def tagged
-        ::Rails.logger.tagged(tags) do
-          Sidekiq.logger.tagged(tags) do
-            yield
+        if ::Rails.logger.respond_to?(:tagged) && Sidekiq.logger.respond_to?(:tagged)
+          ::Rails.logger.tagged(tags) do
+            Sidekiq.logger.tagged(tags) do
+              yield
+            end
           end
+        else
+          yield
         end
-
       end
 
       def tags

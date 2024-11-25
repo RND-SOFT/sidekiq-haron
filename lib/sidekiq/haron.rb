@@ -1,5 +1,6 @@
 require 'sidekiq'
 require 'sidekiq/haron/formatter'
+require 'sidekiq/haron/redis_converts'
 require 'sidekiq/haron/storage'
 require 'sidekiq/haron/transmitter'
 require 'sidekiq/haron/job_logger'
