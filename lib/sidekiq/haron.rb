@@ -19,9 +19,9 @@ module Sidekiq
       @transmitter = v
     end
 
-    def self.install transmitter_class
+    def self.install transmitter_class, with_tagged_logging: true
       Sidekiq::Haron.transmitter = transmitter_class.new
-      set_loggers
+      set_loggers with_tagged_logging
       Sidekiq.configure_server do |c|
         configure_client_middleware(c)
         configure_server_middleware(c)
@@ -31,10 +31,10 @@ module Sidekiq
       end
     end
 
-    def self.set_loggers
+    def self.set_loggers with_tagged_logging
       Sidekiq.configure_server do |config|
         config.logger.formatter = Sidekiq::Haron::Formatter.new
-        config.logger = ActiveSupport::TaggedLogging.new(Sidekiq.logger)
+        config.logger = ActiveSupport::TaggedLogging.new(Sidekiq.logger) if with_tagged_logging
 
         config[:job_logger] = Sidekiq::Haron::JobLogger
         config.error_handlers << Sidekiq::Haron::ExceptionLogger.new
