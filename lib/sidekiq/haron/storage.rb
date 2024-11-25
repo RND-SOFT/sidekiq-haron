@@ -2,6 +2,8 @@ module Sidekiq
   module Haron
     module Storage
 
+      include RedisConverts
+
       DEFAULT_EXPIRY = 7 * 24 * 60 * 60 # 7 days
 
       protected
@@ -17,13 +19,8 @@ module Sidekiq
             # ~/.rvm/gems/ruby-3.3.5/gems/irb-1.14.1/lib/irb.rb:1260:in `full_message': Unsupported command argument type: NilClass (TypeError)
             # raise TypeError, "Unsupported command argument type: #{element.class}"
             #       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-            # Потому введена интерпретация значений:
-            #   nil   - ''
-            #   true  - 1
-            #   false - 0
-            values = data.to_a.flatten(1).map{ |each| each.nil? ? '' : each }.map{ |each| each == true ? 1 : (each == false ? 0 : each) }
             # уход от deprecated-предупреждений внутри sidekiq - нативный вызов hmset для клиента redis
-            pipeline.call('hmset', key(id), *(values))
+            pipeline.call('hmset', key(id), *(encode_values_from data.to_a.flatten(1)))
             pipeline.expire key(id), DEFAULT_EXPIRY
           end[0]
         end
@@ -31,7 +28,7 @@ module Sidekiq
 
       def read_for_id(id)
         Sidekiq.redis do |conn|
-          conn.hgetall(key(id))
+          decode_values_from conn.hgetall(key(id))
         end
       end
 
