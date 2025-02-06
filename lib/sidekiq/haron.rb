@@ -8,6 +8,7 @@ require 'sidekiq/haron/exception_logger'
 require 'sidekiq/haron/client_middleware'
 require 'sidekiq/haron/server_middleware'
 require 'sidekiq/haron/version'
+require 'monkey_patching/active_support/broadcast_logger_patcher'
 
 module Sidekiq
   module Haron
