@@ -6,7 +6,7 @@ module MonkeyPatching
       def method_missing(name, ...)
         loggers = if name == :tagged
                     # only this way reimplemented
-                    @broadcasts.select { |logger| !logger.is_a? ::Sidekiq::Logger }
+                    @broadcasts.select { |logger| !logger.is_a?(::Sidekiq::Logger) && logger.respond_to?(:tagged) }
                   else
                     @broadcasts.select { |logger| logger.respond_to?(name) }
                   end
