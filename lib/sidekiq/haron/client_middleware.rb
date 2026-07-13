@@ -1,6 +1,7 @@
 module Sidekiq
   module Haron
     class ClientMiddleware
+      include Sidekiq::ClientMiddleware
 
       def call(worker_class, msg, queue, redis_pool=nil)
         if msg['retry_count'].blank? # don't store on retry
