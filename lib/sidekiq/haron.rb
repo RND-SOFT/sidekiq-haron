@@ -1,4 +1,10 @@
 require 'sidekiq'
+
+require 'active_support'
+require 'active_support/core_ext/object/blank'
+require 'active_support/tagged_logging'
+require 'active_support/broadcast_logger'
+
 require 'sidekiq/haron/formatter'
 require 'sidekiq/haron/redis_converts'
 require 'sidekiq/haron/storage'

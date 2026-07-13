@@ -34,8 +34,9 @@ module Sidekiq
           CLASSES_TO_CONVERT.each do |k, v|
             return k if v[:redis_value] == redis_value
           end
-        end
 
+          nil
+        end
       end
     end
   end
